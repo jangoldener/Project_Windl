@@ -13,6 +13,8 @@ geolocator = Nominatim(user_agent="location_app")
 # Title of the app
 st.title("Location Finder with Nearby Lakes in Switzerland")
 
+#TEST Jan für Infos
+
 # Check if there is already a selected lake stored in the session state
 if "selected_lake" not in st.session_state:
     st.session_state.selected_lake = None
