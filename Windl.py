@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import requests
 import pandas as pd
 
+#test jan
 # Initialize the geolocator
 geolocator = Nominatim(user_agent="location_app")
 
