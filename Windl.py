@@ -7,14 +7,11 @@ from datetime import datetime, timedelta
 import requests
 import pandas as pd
 
-#test jan
 # Initialize the geolocator
 geolocator = Nominatim(user_agent="location_app")
 
 # Title of the app
 st.title("Location Finder with Nearby Lakes in Switzerland")
-
-#TEST Jan für Infos
 
 # Check if there is already a selected lake stored in the session state
 if "selected_lake" not in st.session_state:
@@ -22,7 +19,7 @@ if "selected_lake" not in st.session_state:
 
 # Function to fetch weather data from Open-Meteo API with 3-hour intervals
 def fetch_weather_3_hour(lat, lon, date):
-    url = "https://api.open-meteo.com/v1/forecast"
+    url = "https://api.open-meteo.com/v1/forecast" 
     params = {
         "latitude": lat,
         "longitude": lon,
