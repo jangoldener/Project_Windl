@@ -1,12 +1,12 @@
 import streamlit as st
-from geopy.geocoders import Nominatim
-from geopy.distance import geodesic
-import folium
-from streamlit_folium import st_folium
-from datetime import datetime, timedelta
-import requests
+from geopy.geocoders import Nominatim # Locations
+from geopy.distance import geodesic # Distance for beginning and at the end for Maps
+import folium # Create the Map
+from streamlit_folium import st_folium #Helps integrate the Folim maps into streamlit
+from datetime import datetime, timedelta 
+import requests # getting the weahter data form a link request 
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # for visualisation
 import streamlit.components.v1 as components
 
 # Initialize the geolocator
