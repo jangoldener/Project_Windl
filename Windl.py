@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import requests # getting the weahter data form a link request 
 import pandas as pd
 import matplotlib.pyplot as plt # for visualisation
-import streamlit.components.v1 as components
+import streamlit.components.v1 as components # for embeding the webcam
 
 # Initialize the geolocator
 geolocator = Nominatim(user_agent="location_app")
@@ -107,7 +107,7 @@ if st.session_state.selected_lake:
 
     st.title("Lake Webcam Stream")
     st.write(f"Webcam view of {selected_lake['name']}") #f, is for the f-string, then afterwards with name we can put out the name of the selected lake
-    st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False)
+    st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False) # lets you embed the the website, in our case the webcam, code created with help of discuission platfor, (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
     
     # Generate and display directions link, to help create this code we used ChatGPT, mostly for how to structure it correctly
     if "user_location" in st.session_state:
