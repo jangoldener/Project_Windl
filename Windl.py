@@ -56,6 +56,12 @@ def fetch_weather_3_hour(lat, lon, date):
     else:
         return None, "Unable to retrieve weather data."
 
+# Function to generate Google Maps directions, or jsut link for it, to help create this code we used ChatGPT, most for what and how to return something
+def generate_directions_link(start_coords, end_coords):
+    start_lat, start_lon = start_coords
+    end_lat, end_lon = end_coords
+    return f"https://www.google.com/maps/dir/{start_lat},{start_lon}/{end_lat},{end_lon}"
+
 # If a lake has been selected, display its details on a new page and fetch weather
 if st.session_state.selected_lake:
     selected_lake = st.session_state.selected_lake
@@ -98,11 +104,19 @@ if st.session_state.selected_lake:
         st.write("Wind speeds above 3 m/s (suitable for sailing) are highlighted in the 'Wind Speed > 3 m/s (suitable)' series.")
     else:
         st.write(error)
-    
-    st.title("Mountain Webcam Stream")
-    st.write("Embedded mountain webcam view:")
-    st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False)
 
+    st.title("Lake Webcam Stream")
+    st.write(f"Webcam view of {selected_lake['name']}") #f, is for the f-string, then afterwards with name we can put out the name of the selected lake
+    st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False)
+    
+    # Generate and display directions link, to help create this code we used ChatGPT, mostly for how to structure it correctly
+    if "user_location" in st.session_state:
+        directions_link = generate_directions_link(
+            st.session_state["user_location"],
+            (selected_lake["latitude"], selected_lake["longitude"])
+        )
+        st.markdown(f"[Get Directions to {selected_lake['name']}]({directions_link})")
+    
     if st.button("Back to Map"):
         st.session_state.selected_lake = None
         st.experimental_rerun()
