@@ -10,17 +10,21 @@ import matplotlib.pyplot as plt # for visualisation
 import streamlit.components.v1 as components # for embeding the webcam
 
 # Initialize the geolocator
-geolocator = Nominatim(user_agent="location_app")
+geolocator = Nominatim(user_agent="location_app") 
+#We set up a geolovator tool called Nominatim, which is part of a package called geopy. The geolocator helps us find the latitude and longitude for a place name, or find a place name on the basis of coordinates.
 
 # Title of the app
 st.title("Location Finder with Nearby Lakes in Switzerland")
+#Here we set up a title at the top of our app's page, we use st.title() which displays "Location FInder with Nearby Lakes in Switzerland" as a header, so users know the main purpose of our app.
 
 # Check if there is already a selected lake stored in the session state
 if "selected_lake" not in st.session_state:
     st.session_state.selected_lake = None
+#This part of our code checks if a variable called selected_lake is already stored in st.session_state. which is a special storage in Streamlit that keeps values between user actions, like clicks or page refreshes.
+#If selected_lake isn't in st.session_state yet, it sets st.session_state.selected_lake to None (meaning that no lake has been chosen)
 
 # Function to fetch weather data from Open-Meteo API with 3-hour intervals
-def fetch_weather_3_hour(lat, lon, date):
+def fetch_weather_3_hour(lat, lon, date): #This line defines a new function which will take three inputs: lat (latitude), lon (longitude) and date. The function is designed to fetch weather data from our online source based on these inputs.
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
@@ -30,6 +34,11 @@ def fetch_weather_3_hour(lat, lon, date):
         "start_date": date,
         "end_date": date
     }
+    #we set up the API's URL and create a dictionary called params with key details needed to get the weather data:
+    #"latitude" and "longitude" specify the location of interest.
+    #"hourly" tells the API that we want temperature and wind speed data every hour.
+    #"timezone": "Europe/Zurich" ensures the data matches Switzerland's time zone.
+    #"start_date" and "end_date" limit the data to just one day - the date we pass in.
     
     response = requests.get(url, params=params)
     data = response.json()
