@@ -41,31 +41,52 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
     #"start_date" and "end_date" limit the data to just one day - the date we pass in.
     
     response = requests.get(url, params=params)
+    #We send a GET request to the API using the requests.get() method, passing in the URL and the parameters.
     data = response.json()
+    #The response from the API is stored in response and we convert it to JSON format with response.json() so it's easy to work with as data.
     
     if response.status_code == 200 and "hourly" in data:
+    #Here we check two things to make sure the data was retrieved successfully:
+    #response.status_sode == 200 checks if the request qas successful (status code 200 means "OK")
+    #"hourly" in data confirms that the expected hourly weather data is actually in the response.
+        #in the next step we pull out the specific weather details we want from the response data:
         times = data["hourly"]["time"]
+        #times contains the time points of the weather readings.
         temperatures = data["hourly"]["temperature_2m"]
+        #temperature has temperature data for each time point.
         wind_speeds = data["hourly"]["windspeed_10m"]
+        #wind_speeds holds the wind speed data for each time point.
         
         weather_df = pd.DataFrame({
+        #We create a DataFrame called weather_df using pd.DataFrame(), which organizes the weather data in table format.
             "Time": times,
             "Temperature (°C)": temperatures,
             "Wind Speed (m/s)": wind_speeds
+            #This table has three columns: Time, Temperature (°C) and wind speed (m/s).
         })
         weather_df["Time"] = pd.to_datetime(weather_df["Time"])
-        
+        #Here we convert the Time column in weather_df into a datetime format, making it easier to handle time-based data in the DataFrame.
+
+        #In these lines we create two new columns to categorize the wind speed:
         weather_df["Wind Speed > 3 m/s (suitable)"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] > 3)
+        #"Wind Speed > 3 m/s (suitable)" only keeps wind speeds greater than 3 m/s (suitable for some water activities), leaving other values blank.
         weather_df["Wind Speed ≤ 3 m/s"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] <= 3)
+        #"Wind Speed < 3 m/s (suitable)" does the opposite, keeping values 3 m/s or less and leaving other values blank.
         
         weather_df = weather_df.set_index("Time").resample("1H").first()
+        #We resample the data to 1-hour intervals to organize it neatly by hour.
         weather_df["3H Label"] = weather_df.index.to_series().where(weather_df.index.minute == 0).resample("3H").first()
+        #The 3HLabel column marks times every 3 hours to make it easy to check data at 3-hour intervals.
 
         return weather_df, None
     else:
         return None, "Unable to retrieve weather data."
+        #If the data fetch was successful, weater_df is returned, along with None for no error.
+        #If it was unsuccessful, it returns None for the data and a message saying "Unable to retrieve weather data".
 
 # Function to generate Google Maps directions, or jsut link for it, to help create this code we used ChatGPT, most for what and how to return something
+#This function creates a link to Google Maps directions between two points: start_coords and end_coords.
+#We separate the latitude and longitude for both starting and ending points, the3n return a link to Google Maps.
 def generate_directions_link(start_coords, end_coords):
     start_lat, start_lon = start_coords
     end_lat, end_lon = end_coords
