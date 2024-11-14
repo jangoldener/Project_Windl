@@ -86,80 +86,106 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
 
 # Function to generate Google Maps directions, or jsut link for it, to help create this code we used ChatGPT, most for what and how to return something
 #This function creates a link to Google Maps directions between two points: start_coords and end_coords.
-#We separate the latitude and longitude for both starting and ending points, the3n return a link to Google Maps.
+#We separate the latitude and longitude for both starting and ending points, then return a link to Google Maps.
 def generate_directions_link(start_coords, end_coords):
     start_lat, start_lon = start_coords
     end_lat, end_lon = end_coords
     return f"https://www.google.com/maps/dir/{start_lat},{start_lon}/{end_lat},{end_lon}"
 
 # If a lake has been selected, display its details on a new page and fetch weather
+#This section checks if selected_lake has a value.
+#If yes, it saves the selected lake's data and date to variables selected_lake and selected_date.
 if st.session_state.selected_lake:
     selected_lake = st.session_state.selected_lake
     selected_date = st.session_state.selected_date
-
+    
+#Next up we display the name, coordinates and date chosen for the selected lake using Streamlit functions to show text on the app page.
     st.header(f"Details for {selected_lake['name']}")
     st.write(f"**Coordinates:** Latitude {selected_lake['latitude']}, Longitude {selected_lake['longitude']}")
     st.write(f"**Selected Date:** {selected_date}")
 
+#This line calls the fetch_weather_3_hour function using the latitude, longitude and date of the selected lake
+#It tries to get the weather data for the chosen lake and date storing it in weather_data. If there's an error, error will hold an error message.
     weather_data, error = fetch_weather_3_hour(selected_lake["latitude"], selected_lake["longitude"], selected_date)
-    
+
+#This checks if weather_data was successfully retrieved-
+#If yes, a subheader "Temperature and Wind Speed (3-Hour Intervals)" is displayed to introduce the chart.
     if weather_data is not None:
         st.subheader("Temperature and Wind Speed (3-Hour Intervals)")
         
         # Plot non-zoomable area chart with Matplotlib
+        #Here we create a new plot using matplotlib.
+        #The figsize(10,6) makes the plot 10 units wide and 6 units tall.
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # Plot temperature as the background layer
+        #This plots the temperature data from weather_data on the graph, setting it as the background layer.
+        #The line color is set to "sky blue" and it's labeled as "Temperature (°C)" so it appears in the legend.
         ax.plot(weather_data.index, weather_data["Temperature (°C)"], color="skyblue", label="Temperature (°C)")
         
         # Plot green area up to the maximum wind speed for wind speeds ≤ 3 m/s
+        #This shades the area under the wind speed data in green where wind speeds are 3 m/s or below.
+        #The alpha=0.5 makes the shading partially transparent.
         ax.fill_between(weather_data.index, 0, weather_data["Wind Speed (m/s)"], 
                         color="green", alpha=0.5, label="Wind Speed ≤ 3 m/s")
 
         # Plot orange area only for wind speeds > 3 m/s, covering the green area where applicable
+        #This shades the area in orange for wind speeds above 3 m/s, overlapping the green shade if needed.
+        #Wind speeds above 3 m/s are marked as suitable for specific activities, as shown in the label.
         ax.fill_between(weather_data.index, 0, weather_data["Wind Speed (m/s)"], 
                         where=weather_data["Wind Speed (m/s)"] > 3, 
                         color="orange", alpha=1, label="Wind Speed > 3 m/s (suitable)")
 
         # Set labels and title
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Values")
-        ax.set_title("Weather Data")
-        ax.legend()
+        ax.set_xlabel("Time")  #adds a label "Time" for the x-axis.
+        ax.set_ylabel("Values") #labels the y-asis as "Values" (since it includes both temperature and wind speed)
+        ax.set_title("Weather Data") #gives the chart a title.
+        ax.legend() #displays the legend, so users know what each color represents.
         
         # Display the plot in Streamlit without zoom functionality
         st.pyplot(fig)
-        
+
+        #These st.write lines give a brief description of the chart for the user.
         st.write("The chart shows temperature and wind speeds at 3-hour intervals.")
         st.write("Wind speeds above 3 m/s (suitable for sailing) are highlighted in the 'Wind Speed > 3 m/s (suitable)' series.")
     else:
+        #If weather_data is None, meaning there was an issue retrieving it, this line displays the error message instead.
         st.write(error)
-
+    #Shows a title indicating that there's a live webcam stream.
     st.title("Lake Webcam Stream")
+    #displays the lake's name using a f-string.
     st.write(f"Webcam view of {selected_lake['name']}") #f, is for the f-string, then afterwards with name we can put out the name of the selected lake
     st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False) # lets you embed the the website, in our case the webcam, code created with help of discuission platfor, (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
     
     # Generate and display directions link, to help create this code we used ChatGPT, mostly for how to structure it correctly
+    #if the user's location is available in session_state, this creates a link to get directions to the selected lake.
+    #the gernerate_directions_link function creates the URL using the user's coordinates and the lake's.
     if "user_location" in st.session_state:
         directions_link = generate_directions_link(
             st.session_state["user_location"],
             (selected_lake["latitude"], selected_lake["longitude"])
         )
-        st.markdown(f"[Get Directions to {selected_lake['name']}]({directions_link})")
-    
+        st.markdown(f"[Get Directions to {selected_lake['name']}]({directions_link})") #displays a clickable link labeled with the lake's name, leading to Google Maps.
+
+    #This adds a "Back to Map" button.
+    #When clicked, it resets selected_lake to None and reloads the page to show the map again.
     if st.button("Back to Map"):
         st.session_state.selected_lake = None
         st.experimental_rerun()
-
+#This creates a text input, where users can enter a location name.
 else:
-    location = st.text_input("Enter a location (e.g., 'Zurich', 'St. Gallen', 'New York'):")
+    location = st.text_input("Enter a location (e.g., 'Zurich', 'St. Gallen', 'Lucerne'):")
 
+    #This sets up a date picker that limits choices from today up to 14 days ahead.
     today = datetime.now()
     selected_date = st.date_input("Select a date:", today, min_value=today, max_value=today + timedelta(days=14))
+    #This line stores the selected date in the YYYY-MM-DD format.
     st.session_state.selected_date = selected_date.strftime('%Y-%m-%d')
 
+    #Here we create a slider allowing users to choose a radius (1 to 100km) for the lake search area.
     radius = st.slider("Select radius (in kilometers):", min_value=1, max_value=100, value=10)
 
+    #This is a list of lake dictionaries each containing the lake's name, coordinates and webcam URL (if available).
     swiss_lakes = [
         {"name": "Lake Zurich", "latitude": 47.232625, "longitude": 8.704907, "webcam_url": "https://rcz.ch/webcam"}, 
         {"name": "Lake Zug", "latitude": 47.143029, "longitude": 8.481866},
@@ -167,6 +193,7 @@ else:
         {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019},
     ]
 
+    #This function returns an appropriate zoom level for the map, depending on the chosen radius.
     def calculate_zoom_level(radius_km):
         if radius_km <= 1:
             return 15
@@ -181,28 +208,35 @@ else:
         else:
             return 8
 
+    #If a location name was entered, we can here use geolocator.geocode to get its coordinates.
     if location:
         loc = geolocator.geocode(location)
-        
+
+        #If a location was found, it's saved in session_state and displayed with its coordinates and the selected date.
         if loc:
             st.session_state["user_location"] = (loc.latitude, loc.longitude)
             
             st.write(f"**Location:** {loc.address}")
             st.write(f"**Latitude:** {loc.latitude}, **Longitude:** {loc.longitude}")
             st.write(f"**Selected Date:** {selected_date.strftime('%Y-%m-%d')}")
-            
+
+            #Here we create a folium map centered on the user's location, with a zoom level calculated by calculate_zoom_level.
+            #It adds a blue marker showing the user's location.
             zoom_level = calculate_zoom_level(radius)
             
             m = folium.Map(location=[loc.latitude, loc.longitude], zoom_start=zoom_level)
             folium.Marker([loc.latitude, loc.longitude], tooltip=loc.address, icon=folium.Icon(color="blue")).add_to(m)
-            
+
+            #A circle showing the search area (in blue) is drawn around the user's location in the map.
             folium.Circle(
                 location=[loc.latitude, loc.longitude],
                 radius=radius * 1000,
                 color="blue",
                 fill=False
             ).add_to(m)
-            
+
+            #This loop calculates the distance between the user's location and each lake.
+            #If a lake is within the radius, a red marker for that lake is added to the map, with a tooltip showing its name and distance.
             for lake in swiss_lakes:
                 lake_coords = (lake["latitude"], lake["longitude"])
                 location_coords = (loc.latitude, loc.longitude)
@@ -218,9 +252,11 @@ else:
                     
                     marker.add_child(folium.Popup(f"Click here to select {lake['name']}", parse_html=True))
                     marker.add_to(m)
-
+            #The map is displayed in the app with a width of 700 and a height of 500.
             st_map = st_folium(m, width=700, height=500)
-
+            
+            #If the user clicks on a lake marker, this checks if any lake in swiss_lake matches the clicked coordinates.
+            #If a match is found, st.session_state.selected_lake is set to that lake's data and the st.experimental_rerun() reloads the app to show details for the selected lake.
             if st_map["last_object_clicked"] is not None:
                 clicked_coords = st_map["last_object_clicked"]["lat"], st_map["last_object_clicked"]["lng"]
                 for lake in swiss_lakes:
