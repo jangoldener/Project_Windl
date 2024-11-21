@@ -182,8 +182,8 @@ else:
     #This line stores the selected date in the YYYY-MM-DD format.
     st.session_state.selected_date = selected_date.strftime('%Y-%m-%d')
 
-    #Here we create a slider allowing users to choose a radius (1 to 100km) for the lake search area.
-    radius = st.slider("Select radius (in kilometers):", min_value=1, max_value=100, value=10)
+    #Here we create a slider allowing users to choose a radius (20 to 140km) for the lake search area.
+    radius = st.slider("Select radius (in kilometers):", min_value=20, max_value=140, value=20)
 
     #This is a list of lake dictionaries each containing the lake's name, coordinates and webcam URL (if available).
     swiss_lakes = [
@@ -198,11 +198,8 @@ else:
         {"name": "Lake Thunersee", "latitude": 46.714520, "longitude": 7.694180, "webcam_url": "https://content.meteobridge.com/cam/77be13b2a74ad2b8bd21d5101c18b18d/camplus.jpg"},
         {"name": "Lake Bielersee Ipsach", "latitude": 47.117030, "longitude": 7.224540, "webcam_url": "https://www.baspomedia.ch/webcam/ipsach/webcam_mega.jpg"},
         {"name": "Lake Urnsersee", "latitude": 46.917750, "longitude": 8.595310, "webcam_url": ""},
-        
 
-        
-
-    ]"
+        ]
 
     #This function returns an appropriate zoom level for the map, depending on the chosen radius.
     def calculate_zoom_level(radius_km):
