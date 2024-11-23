@@ -188,17 +188,19 @@ else:
     #This is a list of lake dictionaries each containing the lake's name, coordinates and webcam URL (if available).
     swiss_lakes = [
         {"name": "Lake Zurich", "latitude": 47.232625, "longitude": 8.704907, "webcam_url": "https://rcz.ch/webcam"}, 
-        {"name": "Lake Zug", "latitude": 47.177770, "longitude": 8.493900},
+        {"name": "Lake Zug", "latitude": 47.177770, "longitude": 8.493900, "webcam_url": "https://zug-stadt.roundshot.com/"},
         {"name": "Lake Greifensee", "latitude": 47.349059, "longitude": 8.679752},
-        {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019},
+        {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019, "webcam_url": "https://wildspitz.roundshot.com/"},
         {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-surfcenter.html"},
         {"name": "Lake Vierwaldstettersee", "latitude": 47.000890, "longitude": 8.580360, "webcam_url": "https://www.foto-webcam.eu/webcam/brunnen/"},
         {"name": "Lake Murtensee", "latitude": 46.933720, "longitude": 7.120470 , "webcam_url": "https://morat.roundshot.com/"},
-        {"name": "Lake Sempachersee", "latitude": 47.047300, "longitude": 8.317306, "webcam_url": "http://seeland.ddns.net:8080/view/view.shtml?id=31445&imagepath=%2Fmjpg%2Fvideo.mjpg%3Fcamera%3D1&size=1"},
+        {"name": "Lake Sempachersee", "latitude": 47.134330, "longitude": 8.192780, "webcam_url": "https://luks-sursee.roundshot.com/"},
         {"name": "Lake Thunersee", "latitude": 46.714520, "longitude": 7.694180, "webcam_url": "https://content.meteobridge.com/cam/77be13b2a74ad2b8bd21d5101c18b18d/camplus.jpg"},
         {"name": "Lake Bielersee Ipsach", "latitude": 47.117030, "longitude": 7.224540, "webcam_url": "https://www.baspomedia.ch/webcam/ipsach/webcam_mega.jpg"},
         {"name": "Lake Urnsersee", "latitude": 46.917750, "longitude": 8.595310, "webcam_url": ""},
-
+        {"name": "Lake Neuchatel", "latitude": 46.804900, "longitude": 6.734640, "webcam_url": "https://www.youtube.com/watch?v=p0YDJ55WhCo"},
+        {"name": "Lake Daubensee", "latitude": 46.383659, "longitude": 7.625390, "webcam_url": "https://gemmi.roundshot.com/"},
+        {"name": "Lake Bodensee", "latitude": 47.572220, "longitude": 9.377610, "webcam_url": "https://romanshorn.roundshot.com/"},
         ]
 
     #This function returns an appropriate zoom level for the map, depending on the chosen radius.
