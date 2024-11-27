@@ -120,10 +120,7 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
         weather_df["Wind Speed ≤ 3 m/s"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] <= 3)
         #"Wind Speed < 3 m/s (suitable)" does the opposite, keeping values 3 m/s or less and leaving other values blank.
         
-        weather_df = weather_df.set_index("Time").resample("1H").first()
-        #We resample the data to 1-hour intervals to organize it neatly by hour.
-        weather_df["3H Label"] = weather_df.index.to_series().where(weather_df.index.minute == 0).resample("3H").first()
-        #The 3HLabel column marks times every 3 hours to make it easy to check data at 3-hour intervals.
+        
 
         return weather_df, weather_df2, weather_df3, weather_df4, None
     else:
@@ -160,44 +157,38 @@ if st.session_state.selected_lake:
     if weather_data is not None:
         st.subheader("Temperature and Wind Speed (3-Hour Intervals)")
         
-        # Plot non-zoomable area chart with Matplotlib
-        #Here we create a new plot using matplotlib.
-        #The figsize(10,6) makes the plot 10 units wide and 6 units tall.
-        fig, ax = plt.subplots(figsize=(10, 6))
+        # Display temperature and wind speed with conditional suitability for sailing
+        st.area_chart(weather_data[["Temperature (°C)", "Wind Speed > 3 m/s (suitable)", "Wind Speed ≤ 3 m/s"]])
         
-        # Plot temperature as the background layer
-        #This plots the temperature data from weather_data on the graph, setting it as the background layer.
-        #The line color is set to "sky blue" and it's labeled as "Temperature (°C)" so it appears in the legend.
-        ax.plot(weather_data.index, weather_data["Temperature (°C)"], color="skyblue", label="Temperature (°C)")
-        
-        # Plot green area up to the maximum wind speed for wind speeds ≤ 3 m/s
-        #This shades the area under the wind speed data in green where wind speeds are 3 m/s or below.
-        #The alpha=0.5 makes the shading partially transparent.
-        ax.fill_between(weather_data.index, 0, weather_data["Wind Speed (m/s)"], 
-                        color="green", alpha=0.5, label="Wind Speed ≤ 3 m/s")
-
-        # Plot orange area only for wind speeds > 3 m/s, covering the green area where applicable
-        #This shades the area in orange for wind speeds above 3 m/s, overlapping the green shade if needed.
-        #Wind speeds above 3 m/s are marked as suitable for specific activities, as shown in the label.
-        ax.fill_between(weather_data.index, 0, weather_data["Wind Speed (m/s)"], 
-                        where=weather_data["Wind Speed (m/s)"] > 3, 
-                        color="orange", alpha=1, label="Wind Speed > 3 m/s (suitable)")
-
-        # Set labels and title
-        ax.set_xlabel("Time")  #adds a label "Time" for the x-axis.
-        ax.set_ylabel("Values") #labels the y-asis as "Values" (since it includes both temperature and wind speed)
-        ax.set_title("Weather Data") #gives the chart a title.
-        ax.legend() #displays the legend, so users know what each color represents.
-        
-        # Display the plot in Streamlit without zoom functionality
-        st.pyplot(fig)
-
-        #These st.write lines give a brief description of the chart for the user.
         st.write("The chart shows temperature and wind speeds at 3-hour intervals.")
         st.write("Wind speeds above 3 m/s (suitable for sailing) are highlighted in the 'Wind Speed > 3 m/s (suitable)' series.")
+
+        st.subheader("Niederschlag und Sonneneinstrahlung (3-Hour Intervals)")
+        
+        # Display rain and radiation
+        st.area_chart(weather_data2[["Niederschlag (mm)", "Sonneneinstrahlung (Watt)"]])
+        
+        st.write("The chart shows precipitation and sun shortwave radiation (Watt)  at 3-hour intervals.")
+        
+
+        st.subheader("Luftdruck (3-Hour Intervals)")
+        # Display Luftdruck (hPa) 
+        st.area_chart(weather_data3[["Luftdruck (hPa)"]])
+
+        st.write("The chart shows the air pressure in hPa at 3-hour intervals.")
+
+        st.subheader("Relative Luftfeuchtigkeit (3-Hour Intervals)")
+        # Display rel. Luftfeuchtigkeit (%)
+        st.area_chart(weather_data4[["rel. Luftfeuchtigkeit (%)"]])
+
+        st.write("The chart shows the Relative humidity in % at 3-hour intervals.")
+
+    
+       
     else:
-        #If weather_data is None, meaning there was an issue retrieving it, this line displays the error message instead.
         st.write(error)
+
+    
     #Shows a title indicating that there's a live webcam stream.
     st.title("Lake Webcam Stream")
     #displays the lake's name using a f-string.
