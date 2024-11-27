@@ -8,6 +8,16 @@ import requests # getting the weahter data form a link request
 import pandas as pd
 import matplotlib.pyplot as plt # for visualisation
 import streamlit.components.v1 as components # for embeding the webcam
+import json
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score, make_scorer
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+
+
+debug = False
 
 # Initialize the geolocator
 geolocator = Nominatim(user_agent="location_app") 
@@ -29,7 +39,7 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
     params = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": ["temperature_2m", "windspeed_10m"],
+        "hourly": ["temperature_2m", "windspeed_10m", "precipitation", "surface_pressure", "relative_humidity_2m", "shortwave_radiation"],
         "timezone": "Europe/Zurich",
         "start_date": date,
         "end_date": date
@@ -44,6 +54,12 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
     #We send a GET request to the API using the requests.get() method, passing in the URL and the parameters.
     data = response.json()
     #The response from the API is stored in response and we convert it to JSON format with response.json() so it's easy to work with as data.
+
+    if debug:
+        str=json.dumps(data, indent=4)
+        st.code(str, language="json")
+
+
     
     if response.status_code == 200 and "hourly" in data:
     #Here we check two things to make sure the data was retrieved successfully:
@@ -56,6 +72,15 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
         #temperature has temperature data for each time point.
         wind_speeds = data["hourly"]["windspeed_10m"]
         #wind_speeds holds the wind speed data for each time point.
+        precip = data["hourly"]["precipitation"]
+        press = data["hourly"]["surface_pressure"]
+        humid = data["hourly"]["relative_humidity_2m"]
+        radi = data["hourly"]["shortwave_radiation"]
+
+
+
+
+
         
         weather_df = pd.DataFrame({
         #We create a DataFrame called weather_df using pd.DataFrame(), which organizes the weather data in table format.
@@ -66,7 +91,29 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
         })
         weather_df["Time"] = pd.to_datetime(weather_df["Time"])
         #Here we convert the Time column in weather_df into a datetime format, making it easier to handle time-based data in the DataFrame.
+        weather_df = weather_df.set_index("Time").resample("3H").first()
 
+
+        weather_df2 = pd.DataFrame({
+            "Time": times,
+            "Niederschlag (mm)": precip,
+            "Sonneneinstrahlung (Watt)": radi
+         })
+        
+
+        weather_df3 = pd.DataFrame({
+            "Time": times,
+            "Luftdruck (hPa)": press,
+         })
+
+        
+
+        weather_df4 = pd.DataFrame({
+            "Time": times,
+            "rel. Luftfeuchtigkeit (%)": humid,
+         })
+
+        
         #In these lines we create two new columns to categorize the wind speed:
         weather_df["Wind Speed > 3 m/s (suitable)"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] > 3)
         #"Wind Speed > 3 m/s (suitable)" only keeps wind speeds greater than 3 m/s (suitable for some water activities), leaving other values blank.
@@ -78,7 +125,7 @@ def fetch_weather_3_hour(lat, lon, date): #This line defines a new function whic
         weather_df["3H Label"] = weather_df.index.to_series().where(weather_df.index.minute == 0).resample("3H").first()
         #The 3HLabel column marks times every 3 hours to make it easy to check data at 3-hour intervals.
 
-        return weather_df, None
+        return weather_df, weather_df2, weather_df3, weather_df4, None
     else:
         return None, "Unable to retrieve weather data."
         #If the data fetch was successful, weater_df is returned, along with None for no error.
@@ -106,7 +153,7 @@ if st.session_state.selected_lake:
 
 #This line calls the fetch_weather_3_hour function using the latitude, longitude and date of the selected lake
 #It tries to get the weather data for the chosen lake and date storing it in weather_data. If there's an error, error will hold an error message.
-    weather_data, error = fetch_weather_3_hour(selected_lake["latitude"], selected_lake["longitude"], selected_date)
+    weather_data, weather_data2, weather_data3, weather_data4,  error = fetch_weather_3_hour(selected_lake["latitude"], selected_lake["longitude"], selected_date)
 
 #This checks if weather_data was successfully retrieved-
 #If yes, a subheader "Temperature and Wind Speed (3-Hour Intervals)" is displayed to introduce the chart.
