@@ -169,7 +169,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Display Precipitation and Solar Radiation
         st.subheader("Precipitation and Solar Radiation (3-Hour Intervals)") # This line creates subheading
         weather_data2["Time"] = pd.to_datetime(weather_data2["Time"]) # Ensure the Time column is in datetime format
-        weather_data2["Formatted Hour"] = weather_data2["Time"].dt.strftime("%H:%M") # Extract formatted time as "HH:MM"
+        weather_data2["Formatted Hour"] = weather_data2["Time"].dt.strftime("%A, %d %B %Y") # Extract formatted time as "HH:MM"
         weather_data2.set_index("Formatted Hour", inplace=True) # Set the formatted hour as the index
         st.area_chart(weather_data2[["Precipitation (mm)", "Solar irradiation (watt)"]]) # Set the formatted hour as the index
         st.write("The chart shows precipitation and solar radiation (Watt) at 3-hour intervals.")
@@ -359,7 +359,7 @@ else:
             
             st.write(f"**Location:** {loc.address}")
             st.write(f"**Latitude:** {loc.latitude}, **Longitude:** {loc.longitude}")
-            st.write(f"**Selected Date:** {selected_date.strftime('%Y-%m-%d')}")
+            st.write(f"**Selected Date:** {selected_date.strftime('%A, %d %B %Y')}")
 
             # Here we create a folium map centered on the user's location, with a zoom level calculated by calculate_zoom_level 
             zoom_level = calculate_zoom_level(radius)
