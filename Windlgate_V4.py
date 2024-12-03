@@ -389,11 +389,17 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
     st.text("")  # Adds an empty line
     st.text("")  # Adds another empty line
+    
+    if selected_lake["name"] == "Lake Silvaplanersee":
+        # Custom title and description for Silvaplanersee
+        st.subheader("Link to Webcam")
+        st.write("View the Silvaplana Lake Webcam [here](https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html).")
+    else:
+        # Default title and embedded iframe for other lakes
+        st.subheader("Lake Webcam Stream")
+        st.write(f"Webcam view of {selected_lake['name']}") # "f", is for the f-string, afterwards with the name we can put out the name of the selected lake
+        st.components.v1.iframe(selected_lake["webcam_url"], height=600, scrolling=False) # Let's you embed the website, in our case the webcam, code created with help of discuission platform: (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
 
-    # Display Lake Webcam Stream
-    st.subheader("Lake Webcam Stream") # Shows a title indicating that there's a live webcam stream
-    st.write(f"Webcam view of {selected_lake['name']}") # "f", is for the f-string, afterwards with the name we can put out the name of the selected lake
-    st.components.v1.iframe(selected_lake['webcam_url'], height=600, scrolling=False) # Let's you embed the website, in our case the webcam, code created with help of discuission platform: (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
     
     # Generate and display directions link (for this code we used ChatGPT, for proper structuring)
     if "user_location" in st.session_state: # If the user's location is available in session_state, this creates a link to get directions to the selected lake
@@ -426,7 +432,7 @@ else:
         {"name": "Lake Zurich", "latitude": 47.232625, "longitude": 8.704907, "webcam_url": "https://rcz.ch/webcam"}, 
         {"name": "Lake Zug", "latitude": 47.177770, "longitude": 8.493900, "webcam_url": "https://zug-stadt.roundshot.com/"},
         {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019, "webcam_url": "https://wildspitz.roundshot.com/"},
-        {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html"},
+        {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html"},
         {"name": "Lake Vierwaldstettersee", "latitude": 47.000890, "longitude": 8.580360, "webcam_url": "https://www.foto-webcam.eu/webcam/brunnen/"},
         {"name": "Lake Murtensee", "latitude": 46.933720, "longitude": 7.120470 , "webcam_url": "https://morat.roundshot.com/"},
         {"name": "Lake Sempachersee", "latitude": 47.134330, "longitude": 8.192780, "webcam_url": "https://luks-sursee.roundshot.com/"},
