@@ -155,6 +155,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
         # Display Temperature and Wind Speed 
     if weather_data is not None: # This checks if weather_data was successfully retrieved
+
         st.subheader("Temperature and Wind Speed (3-Hour Intervals)") # This line creates subheading
         # Display temperature and wind speed with conditional suitability for sailing
         st.area_chart(weather_data[["Temperature (°C)", "Wind Speed > 3 m/s (suitable)", "Wind Speed ≤ 3 m/s"]])
@@ -164,7 +165,6 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
-        st.text("")
                 
 
         # Display Precipitation and Solar Radiation
@@ -178,30 +178,45 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
-        st.text("")
 
 
-        # Display Air Pressure    
-        st.subheader("Air Pressure (3-Hour Intervals)") # This line creates subheading
-        weather_data3["Time"] = pd.to_datetime(weather_data3["Time"]) # Ensure 'Time' is included as the index or column in weather_data3
+        # Display Air Pressure
+        st.subheader("Air Pressure (3-Hour Intervals)")  #Creates a subheading
+
+        # Ensure 'Time' is included as the index or column in weather_data3
+        weather_data3["Time"] = pd.to_datetime(weather_data3["Time"])
         weather_data3 = weather_data3.set_index("Time")
-        # Plot (visual representation of data) for Surface Pressure
+
+        # Calculate dynamic limits for y-axis
+        min_pressure = weather_data3["Luftdruck (hPa)"].min()
+        max_pressure = weather_data3["Luftdruck (hPa)"].max()
+        margin = 2  # Add a margin of ±2 hPa
+        ylim_lower = max(800, min_pressure - margin)  # Ensure lower limit is not below 800
+        ylim_upper = min(1050, max_pressure + margin)  # Ensure upper limit is not above 1050
+
+        # Plot (visual representation of data) for Air Pressure
         plt.style.use("dark_background")
         plt.figure(figsize=(10, 5))
         plt.plot(weather_data3.index, weather_data3["Luftdruck (hPa)"], color="skyblue", linewidth=2)
         plt.title("Air Pressure (3-Hour Intervals)", fontsize=14)
         plt.xlabel("Time (hours)", fontsize=12)
         plt.ylabel("Air Pressure (hPa)", fontsize=12)
-        plt.ylim(800, 1050)
+        plt.ylim(ylim_lower, ylim_upper)
         plt.xticks(rotation=45)
         plt.grid(True, linestyle="--", alpha=0.6, color="white")
-        # Displays the plot in the Streamlit app
+
+        # Display the plot in the Streamlit app
         st.pyplot(plt)
-        st.write("The chart shows the air pressure in hPa at 3-hour intervals.")
+        st.write("The chart shows the air pressure in hPa at 3-hour intervals with dynamic y-axis limits.")
+        st.write("""
+            Air pressure is a key factor in watersports like sailing because it directly impacts wind patterns and strength. 
+            Wind occurs due to air moving from areas of high pressure to low pressure, and this movement drives a sailboat. 
+            High-pressure areas typically produce calmer winds, while low-pressure zones bring stronger and more variable wind conditions. 
+            By keeping track of air pressure changes, sailors can better predict weather, adjust their strategies, and ensure both safety and performance.""")
+
 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
-        st.text("")
 
         # Display Relative Humidity
         st.subheader("Relative Humidity (3-Hour Intervals)") # This line creates subheading (Assuming weather_data4 is a pandas DataFrame)
@@ -283,8 +298,6 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
     st.text("")  # Adds an empty line
     st.text("")  # Adds another empty line
-    st.text("")
-
 
     # Display Lake Webcam Stream
     st.subheader("Lake Webcam Stream") # Shows a title indicating that there's a live webcam stream
@@ -322,7 +335,7 @@ else:
         {"name": "Lake Zurich", "latitude": 47.232625, "longitude": 8.704907, "webcam_url": "https://rcz.ch/webcam"}, 
         {"name": "Lake Zug", "latitude": 47.177770, "longitude": 8.493900, "webcam_url": "https://zug-stadt.roundshot.com/"},
         {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019, "webcam_url": "https://wildspitz.roundshot.com/"},
-        {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-surfcenter.html"},
+        {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html"},
         {"name": "Lake Vierwaldstettersee", "latitude": 47.000890, "longitude": 8.580360, "webcam_url": "https://www.foto-webcam.eu/webcam/brunnen/"},
         {"name": "Lake Murtensee", "latitude": 46.933720, "longitude": 7.120470 , "webcam_url": "https://morat.roundshot.com/"},
         {"name": "Lake Sempachersee", "latitude": 47.134330, "longitude": 8.192780, "webcam_url": "https://luks-sursee.roundshot.com/"},
