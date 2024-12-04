@@ -80,10 +80,6 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
         humid = data["hourly"]["relative_humidity_2m"]
         radi = data["hourly"]["shortwave_radiation"]
 
-
-
-
-
         # We create a DataFrame called weather_df using pd.DataFrame(), which organizes the weather data in table format
         weather_df = pd.DataFrame({
             "Time": times,
@@ -138,9 +134,6 @@ def generate_directions_link(start_coords, end_coords): # This function creates 
     start_lat, start_lon = start_coords # We separate the latitude and longitude for both starting and ending points, then return a link to Google Maps
     end_lat, end_lon = end_coords
     return f"https://www.google.com/maps/dir/{start_lat},{start_lon}/{end_lat},{end_lon}"
-
-
-
 
 
 
@@ -200,18 +193,8 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         st.pyplot(fig)
         st.write("The chart shows Temperature (°C) and Windspeed (m/s) across the day at 3-hour intervals.")
 
-
-
-
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
-
-
- 
-        
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        import streamlit as st
 
         # Ensure 'Time' column is datetime
         weather_data2["Time"] = pd.to_datetime(weather_data2["Time"])
@@ -266,20 +249,8 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         st.pyplot(fig2)
         st.write("This chart shows Solar Irradiation (watt) across the day at 1-hour intervals.")
 
-
-
-
-
-
-
-
-
-
-
-
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
-
 
         # Display Air Pressure
         st.subheader("Air Pressure")  #Creates a subheading
@@ -309,8 +280,6 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Display the plot in the Streamlit app
         st.pyplot(plt)
         st.write("The chart shows the Air Pressure (hPa) across the day at 1-hour intervals.")
-        
-
 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
