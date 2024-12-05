@@ -20,26 +20,26 @@ from joblib import load # To load previously trained models
 
 
 
-# Define a debug flag for controlling error message visibility
+# Define a debug flag to control wheter error messages are displayed
 debug = False # By setting "debug = False", it will be assumed the code is error-free (the program will be executed normally)
 
-# Initialize Geolocator
+# Set up the Geolocator 
 geolocator = Nominatim(user_agent="location_app") 
 # We set up an object, which transforms adresses in geographical coordinates 
 
-# Title of the app
+# App Title and Logo
 st.image("logo.jpg")
 st.title("Breeze Buddy")
 st.subheader("Your Swiss Watersport Companion")
-# Here we set up a title at the top of our app's page, we use st.title() which displays "Location FInder with Nearby Lakes in Switzerland" as a header, so users know the main purpose of our app
+# Here we set up a title at the top of our app's page, we use st.title() which displays "Location Finder with Nearby Lakes in Switzerland" as a header, so users know the main purpose of our app
 
-# Check for Selected Lake
+# Check if a lake is selected
 if "selected_lake" not in st.session_state:
     st.session_state.selected_lake = None
 # This part of our code checks if the variable called selected_lake is already stored in st.session_state. which is a special storage in Streamlit
 # If selected_lake isn't in st.session_state yet, it sets st.session_state.selected_lake to None (so no lake has been chosen)
 
-# Function to Fetch Weather Data (3-Hour Intervals)
+# Function to get weather data at 3-hour-intervalls
 def fetch_weather_3_hour(lat, lon, date): # This line defines a new function which will take three inputs: lat (latitude), lon (longitude) and date
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
@@ -54,12 +54,12 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
     #"latitude" and "longitude" specify the location 
     #"hourly" tells the API that we want temperature and wind speed data every hour
     #"timezone": "Europe/Zurich" ensures the data matches Switzerland's time zone
-    #"start_date" and "end_date" limit the data to just one day - the date we pass in
+    #"start_date" and "end_date" limit the data to just one day - the date we provide it
     
     # We send a GET-Request to the API-URL 
     response = requests.get(url, params=params)
     data = response.json()
-    #The response from the API is stored in a JSON format, which will then be transformed in a Python object (storerd in the variable "data")
+    #The response from the API is stored in a JSON format, which will then be transformed in a Python object (storerd in the variable "data") and used for further use
 
     # If the variable debug has the value "True" the code will be executed through "if" (this is useful if there is an error message and we want to look over the plain data sets)
     if debug:
@@ -67,7 +67,7 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
         st.code(str, language="json")
 
 
-    # Checkpoint: ensuring the data retrieved from the API is usable
+    # Checkpoint: here we ensure that the data retrieved from the API is usable and valid
     if response.status_code == 200 and "hourly" in data: # Response.status_sode == 200 checks if the HTTP request was successful (status code 200 means "OK")
     #"hourly" in data confirms that the expected hourly weather data is actually in the response
 
@@ -80,7 +80,7 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
         humid = data["hourly"]["relative_humidity_2m"]
         radi = data["hourly"]["shortwave_radiation"]
 
-        # We create a DataFrame called weather_df using pd.DataFrame(), which organizes the weather data in table format
+        # We create a DataFrame called weather_df using pd.DataFrame(), which organizes the weather data in table format. This helps us to organize the data.
         weather_df = pd.DataFrame({
             "Time": times,
             "Temperature (°C)": temperatures,
@@ -112,24 +112,24 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
          })
 
         
-        # In these lines we create two new columns to categorize the wind speed:
+        # In these lines we create two new columns to categorize the wind speed for better interpretation
         weather_df["Wind Speed > 3 m/s (suitable)"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] > 3)
         # "Wind Speed > 3 m/s (suitable)" only keeps wind speeds greater than 3 m/s (suitable for some water activities), leaving other values blank
         weather_df["Wind Speed ≤ 3 m/s"] = weather_df["Wind Speed (m/s)"].where(weather_df["Wind Speed (m/s)"] <= 3)
         # "Wind Speed < 3 m/s (suitable)" does the opposite, keeping values 3 m/s or less and leaving other values blank
         
         
-        # Returning the DataFrames
+        # Returning the data in an organized way through DataFrames
         return weather_df, weather_df2, weather_df3, weather_df4, None  # If it was possible to return the weather data the weater_df is returned, along with None for no error.
     else:
         return None, "Unable to retrieve weather data." # If it was not possible to return the weather data, the message will be sent: "Unable to retrieve weather data".
        
         
-# Machine Learning model is loaded 
+# Here we load the machine learning model 
 model = load('wave_height_model.joblib')
 
 
-# Function to generate Google Maps directions (to help create this code we used ChatGPT)
+# Here we use a function to generate Google Maps directions (to help create this code we used ChatGPT)
 def generate_directions_link(start_coords, end_coords): # This function creates a link to Google Maps directions between two points: start_coords and end_coords
     start_lat, start_lon = start_coords # We separate the latitude and longitude for both starting and ending points, then return a link to Google Maps
     end_lat, end_lon = end_coords
@@ -140,7 +140,7 @@ def generate_directions_link(start_coords, end_coords): # This function creates 
 # Main App Logic
 
 if st.session_state.selected_lake: # This section checks if selected_lake has a value
-    selected_lake = st.session_state.selected_lake # If yes, it saves the selected lake's data and date to variables selected_lake and selected_date
+    selected_lake = st.session_state.selected_lake # If a lake is selected, we display its details and weather data
     selected_date = st.session_state.selected_date
     st.header(f"Details for {selected_lake['name']}") # Next up we display the name, coordinates and date chosen for the selected lake using Streamlit functions to show text on the app page
     st.write(f"**Coordinates:** Latitude {selected_lake['latitude']}, Longitude {selected_lake['longitude']}")
@@ -153,7 +153,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
         
 
-        # Assuming weather_data is already prepared and has Time as its index
+        # Creating a subheader 
         st.subheader("Temperature and Wind Speed")
 
         # Set up the dark theme
@@ -170,7 +170,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
             label='Wind Speed (m/s)', linestyle='-', linewidth=2
         )
 
-        # Customization
+        # Customization of the displayed font 
         
         ax.set_xlabel("Time (hours)", fontsize=12)
         ax.set_ylabel('Values', fontsize=14)
@@ -186,23 +186,23 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         ax.grid(visible=True, alpha=0.3, linestyle='--')
         ax.legend(fontsize=12, loc='upper left')
 
-        # Adjust layout for better fit
+        # Here we addjust the layout for a better fit
         plt.tight_layout()
 
-        # Render the plot in Streamlit
+        # Here we render the plot in Streamlit
         st.pyplot(fig)
         st.write("The chart shows Temperature (°C) and Windspeed (m/s) across the day at 3-hour intervals.")
 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
 
-        # Ensure 'Time' column is datetime
+        # Here we ensure that the 'Time' column is datetime
         weather_data2["Time"] = pd.to_datetime(weather_data2["Time"])
 
-        # Subheader for the plots
+        # Creating a subheader for the plots
         st.subheader("Precipitation")
 
-        # Plot Precipitation
+        # Here we plot the precipitation category
         fig1, ax1 = plt.subplots(figsize=(12, 6))
         ax1.plot(
             weather_data2["Time"], weather_data2["Precipitation (mm)"], marker='o', markersize=5,
@@ -230,7 +230,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
 
         st.subheader("Solar Irradiation")
-        # Plot Solar Irradiation
+        # Here we plot the solar irradiation
         fig2, ax2 = plt.subplots(figsize=(12, 6))
         ax2.plot(
             weather_data2["Time"], weather_data2["Solar irradiation (watt)"], marker='o', markersize=5,
@@ -252,7 +252,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
 
-        # Display Air Pressure
+        # Here we display the air pressure category
         st.subheader("Air Pressure")  #Creates a subheading
 
         # Ensure 'Time' is included as the index or column in weather_data3
