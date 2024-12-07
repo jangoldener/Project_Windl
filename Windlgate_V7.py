@@ -164,7 +164,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
             label='Wind Speed (m/s)', linestyle='-', linewidth=2, color="#8000ff", alpha =0.9
         )
 
-        # Customization of the displayed font 
+        # Here we customize the displayed font 
         
         ax.set_xlabel("Time (hours)", fontsize=12)
         ax.set_ylabel('Values', fontsize=14)
@@ -251,7 +251,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Here we display the air pressure category
         st.subheader("Air Pressure")  #Creates a subheading
 
-        # Ensure 'Time' is included as the index or column in weather_data3
+        # We are ensuring that 'Time' is included as the index or column in weather_data3
         weather_data3["Time"] = pd.to_datetime(weather_data3["Time"])
         weather_data3 = weather_data3.set_index("Time")
 
@@ -284,11 +284,11 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         weather_data4["Time"] = pd.to_datetime(weather_data4["Time"])
 
 
-        # Display Relative Humidity
+        # Display relative humidity
         st.subheader("Relative Humidity") # This line creates subheading (Assuming weather_data4 is a pandas DataFrame)
         x_ticks = weather_data4["Time"][::3] # Extract every third value from the "Time" column for the x-tick labels
         plt.style.use("dark_background")
-        # Plot for Relative Humidity
+        # Plot for relative humidity
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(weather_data4["Time"], weather_data4["rel. Luftfeuchtigkeit (%)"], color="#1f77b4", linewidth=2, marker='o',  markersize=5)
         
@@ -301,7 +301,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         st.pyplot(fig) # Display the plot in Streamlit
         st.write("The chart shows the Relative humidity (%) across the day at 1-hour intervals.") 
     
-    # Will be executed if "if" is not executed
+    # if the function cannot be executed, an error message will appear 
     else:
         st.write(error)   
 
@@ -311,56 +311,56 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
     # The Waveheight prediciton therefore is not availabe between 23.00 and 23.59
     if datetime.strptime("00:00", "%H:%M").time() <= current_time < datetime.strptime("23:00", "%H:%M").time():
 
-        # Data Preparation
+        # Here we are doing the data preparation 
         weather_data.index = pd.to_datetime(weather_data.index) # Ensure the index is a datetime object
         weather_data2['Time'] = pd.to_datetime(weather_data2['Time']) # Ensure the 'Time' column is in datetime format
         weather_data3.index = pd.to_datetime(weather_data3.index) # Ensure the index is a datetime object
         weather_data4['Time'] = pd.to_datetime(weather_data4['Time']) # Ensure the 'Time' column is in datetime format
 
-        # Calculate Mean Values for next 3 hours
+        # Here we calculate mean values for next 3 hours
         current_time = datetime.now() # Accessing the current time and storing it in a variable
         time_range_end = current_time + timedelta(hours=3) # Define the time range (next 3 hours)
         
-        # Filter weather_data for the next 3 hours
+        # next up we filter weather_data for the next 3 hours
         next_3_hours_data = weather_data[(weather_data.index > current_time) & (weather_data.index <= time_range_end)] 
 
-        # Calculate mean temperature and wind speed
+        # Here we calculate the mean temperature and wind speed
         mean_temperature_next_3_hours = next_3_hours_data['Temperature (°C)'].mean() # Calculate the mean temperature for the next 3 hours
         mean_wind_speed_next_3_hours = next_3_hours_data['Wind Speed (m/s)'].mean()  # Calculate the mean wind speed for the next 3 hours
 
-        # Filter weather_data2 for the next 3 hours
+        # next up we filter weather_data2 for the next 3 hours
         next_3_hours_data_weather2 = weather_data2[
             (weather_data2['Time'] > current_time) & (weather_data2['Time'] <= time_range_end)]
 
-        # Calculate mean precipitation and solar irradiation
+        # Here we calculate mean precipitation and solar irradiation
         mean_precipitation_next_3_hours = next_3_hours_data_weather2['Precipitation (mm)'].mean() # Calculate the mean precipitation for the next 3 hours
         mean_solar_irradiation_next_3_hours = next_3_hours_data_weather2['Solar irradiation (watt)'].mean() # Calculate the mean solar irradiation for the next 3 hours
 
         time_range_end = current_time + timedelta(hours=3) # Define the time range (next 3 hours)
         
 
-        # Filter weather_data3 for the next 3 hours
+        # next up we filter weather_data3 for the next 3 hours
         next_3_hours_data_weather3 = weather_data3[(weather_data3.index > current_time) & (weather_data3.index <= time_range_end)] # Filter the DataFrame for the next 3 hours
 
-        # Calculate mean pressure for the next 3 hours
+        # Here we alculate mean pressure for the next 3 hours
         mean_pressure_next_3_hours = next_3_hours_data_weather3['Luftdruck (hPa)'].mean() # Calculate the mean pressure for the next 3 hours
 
-        # Filter weather_data4 for the next 3 hours
+        # next up we filter weather_data4 for the next 3 hours
         next_3_hours_data_weather4 = weather_data4[
             (weather_data4['Time'] > current_time) & (weather_data4['Time'] <= time_range_end) # Filter the DataFrame for the next 3 hours based on the 'Time' column
         ]
-        # Calculate mean humidity for the next 3 hours
+        # Here calculate mean humidity for the next 3 hours
         mean_humidity_next_3_hours = next_3_hours_data_weather4['rel. Luftfeuchtigkeit (%)'].mean() # Calculate the mean relative humidity for the next 3 hours
 
     
-        # Make Wave Height Prediction
+        # here we predict the wave height
         prediction = model.predict([[mean_temperature_next_3_hours, mean_humidity_next_3_hours, mean_solar_irradiation_next_3_hours, mean_wind_speed_next_3_hours, mean_precipitation_next_3_hours, mean_pressure_next_3_hours]])  # Replace with actual feature values
 
-        # Display Wave Prediction
+        # Displaying the calculated wave Prediction
         st.text("")  # Adds an empty line
         st.text("")  # Adds another empty line
         st.text("")
-        # Display the prediction in a styled dark box with a white title
+        # Displaying the prediction in a styled dark box with a white title
         st.markdown(f"""
             <div style="border: 1px solid #333; padding: 15px; border-radius: 10px; background-color: #222; text-align: center;">
                 <h3 style="color: #fff; margin: 0;">Wave Height Prediction</h3>
@@ -384,17 +384,17 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
     st.text("")  # Adds another empty line
     
     if selected_lake["name"] == "Lake Silvaplanersee":
-        # Custom title and description for Silvaplanersee
+        # we set up a custom title and description for Silvaplanersee
         st.subheader("Link to Webcam")
         st.write("View the Silvaplana Lake Webcam [here](https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html).")
     else:
-        # Default title and embedded iframe for other lakes
+        # we default the title and embed iframe for other lakes
         st.subheader("Lake Webcam Stream")
         st.write(f"Webcam view of {selected_lake['name']}") # "f", is for the f-string, afterwards with the name we can put out the name of the selected lake
         st.components.v1.iframe(selected_lake["webcam_url"], height=600, scrolling=False) # Let's you embed the website, in our case the webcam, code created with help of discuission platform: (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
 
     
-    # Generate and display directions link (for this code we used ChatGPT, for proper structuring)
+    # we generate and display directions link (for this code we used ChatGPT, for proper structuring)
     if "user_location" in st.session_state: # If the user's location is available in session_state, this creates a link to get directions to the selected lake
         directions_link = generate_directions_link( # The gernerate_directions_link function creates the URL using the user's coordinates and the lake's
             st.session_state["user_location"],
@@ -425,7 +425,6 @@ else:
         {"name": "Lake Zurich", "latitude": 47.232625, "longitude": 8.704907, "webcam_url": "https://rcz.ch/webcam"}, 
         {"name": "Lake Zug", "latitude": 47.177770, "longitude": 8.493900, "webcam_url": "https://zug-stadt.roundshot.com/"},
         {"name": "Lake Aegeri", "latitude": 47.121541, "longitude": 8.630019, "webcam_url": "https://wildspitz.roundshot.com/"},
-        {"name": "Lake Silvaplanersee", "latitude": 46.455214, "longitude": 9.790747, "webcam_url": "https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html"},
         {"name": "Lake Vierwaldstettersee", "latitude": 47.000890, "longitude": 8.580360, "webcam_url": "https://www.foto-webcam.eu/webcam/brunnen/"},
         {"name": "Lake Murtensee", "latitude": 46.933720, "longitude": 7.120470 , "webcam_url": "https://morat.roundshot.com/"},
         {"name": "Lake Sempachersee", "latitude": 47.134330, "longitude": 8.192780, "webcam_url": "https://luks-sursee.roundshot.com/"},
