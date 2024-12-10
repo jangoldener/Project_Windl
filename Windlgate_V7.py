@@ -1,9 +1,9 @@
-import streamlit as st
-from geopy.geocoders import Nominatim # Locations
-from geopy.distance import geodesic # Distance between two geographical points
+import streamlit as st # helps creating interactive data applications
+from geopy.geocoders import Nominatim # Locations, adresses to latitude and longitude coordinates (an in other direction)
+from geopy.distance import geodesic # Calculates distance between two geographical points
 import folium # Create the Map
 from streamlit_folium import st_folium # Helps to integrate the Folim maps into streamlit
-from datetime import datetime, timedelta # Represents the time frame 
+from datetime import datetime, timedelta # Represents the time frame, timedelta handels the differences
 import requests # Getting the weather data form a link request 
 import pandas as pd # Helps to configurate the datasets 
 import matplotlib.pyplot as plt # For visualisation
@@ -14,9 +14,9 @@ from sklearn.model_selection import train_test_split, cross_val_score # Splits d
 from sklearn.ensemble import RandomForestRegressor # Similar to the regression tasks (but predicts values)
 from sklearn.metrics import mean_squared_error, r2_score, make_scorer # Calculates a metric for regression tasks
 import numpy as np # Library for compuations in Python
-from sklearn.model_selection import GridSearchCV # Helps optimize model performance 
+from sklearn.model_selection import GridSearchCV # Helps optimize model performance
 import matplotlib.dates as mdates # Provides functions for handling and formatting data
-from joblib import load # To load previously trained models 
+from joblib import load # To load previously trained models
 
 
 
@@ -40,7 +40,7 @@ if "selected_lake" not in st.session_state:
 # If selected_lake isn't in st.session_state yet, it sets st.session_state.selected_lake to None (so no lake has been chosen)
 
 # Function to get weather data at 3-hour-intervalls
-def fetch_weather_3_hour(lat, lon, date): # This line defines a new function which will take three inputs: lat (latitude), lon (longitude) and date
+def fetch_weather_3_hour(lat, lon, date): # Defines a new function which will take three inputs: lat (latitude), lon (longitude) and date
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
@@ -50,7 +50,7 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
         "start_date": date,
         "end_date": date
     }
-    # We set up the API's URL and create a dictionary called params with key details needed to get the weather data:
+    # Set up the API's URL and create a dictionary called params with key details needed to get the weather data:
     #"latitude" and "longitude" specify the location 
     #"hourly" tells the API that we want temperature and wind speed data every hour
     #"timezone": "Europe/Zurich" ensures the data matches Switzerland's time zone
@@ -63,8 +63,8 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
 
     # If the variable debug has the value "True" the code will be executed through "if" (this is useful if there is an error message and we want to look over the plain data sets)
     if debug:
-        str=json.dumps(data, indent=4)
-        st.code(str, language="json")
+        str=json.dumps(data, indent=4) # Stores the formatted JSON string, "indent=4" for easier reading, 4 spaces
+        st.code(str, language="json") # Display the formatted JSON string from above, code should use JSON language
 
 
     # Checkpoint: here we ensure that the data retrieved from the API is usable and valid
@@ -96,7 +96,7 @@ def fetch_weather_3_hour(lat, lon, date): # This line defines a new function whi
             "Time": times,
             "Precipitation (mm)": precip,
             "Solar irradiation (watt)": radi
-         })
+         }) #dictionary where keys column names and values are the data
         
         # New DataFrame 
         weather_df3 = pd.DataFrame({
@@ -145,26 +145,22 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Display Temperature and Wind Speed 
     if weather_data is not None: # This checks if weather_data was successfully retrieved
 
-       
-    
-        # Creating a subheader 
+        # Creating a subheader
         st.subheader("Temperature and Wind Speed")
 
         # Set up the dark theme
         plt.style.use('dark_background')
 
         # Plot the data
-        fig, ax = plt.subplots(figsize=(12, 6))
+        fig, ax = plt.subplots(figsize=(12, 6)) # Creates figure and axes object for plotting
         ax.plot(
-            weather_data.index, weather_data["Temperature (°C)"], marker='o', markersize=5,
-            label='Temperature (°C)', linestyle='-', linewidth=2, color="cyan", alpha =0.9
-        )
-        ax.plot(
-            weather_data.index, weather_data["Wind Speed (m/s)"], marker='o',  markersize=5,
-            label='Wind Speed (m/s)', linestyle='-', linewidth=2, color="#8000ff", alpha =0.9
-        )
+            weather_data.index, weather_data["Temperature (°C)"], marker='o', markersize=5, label='Temperature (°C)', linestyle='-', linewidth=2, color="cyan", alpha =0.9)
+        # Marker 'o' creates a point in the graph
 
-        # Here we customize the displayed font 
+        ax.plot(
+            weather_data.index, weather_data["Wind Speed (m/s)"], marker='o',  markersize=5, label='Wind Speed (m/s)', linestyle='-', linewidth=2, color="#8000ff", alpha =0.9)
+
+        # Here we customize the displayed font
         
         ax.set_xlabel("Time (hours)", fontsize=12)
         ax.set_ylabel('Values', fontsize=14)
@@ -172,13 +168,13 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Format the x-axis using mdates
         locator = mdates.HourLocator(interval=3)  # Adjust to show ticks every 3 hours
         formatter = mdates.DateFormatter('%Y-%m-%d %H:%M')  # Format time labels
-        ax.xaxis.set_major_locator(locator)
-        ax.xaxis.set_major_formatter(formatter)
+        ax.xaxis.set_major_locator(locator) # Sets positions
+        ax.xaxis.set_major_formatter(formatter) 
 
         ax.tick_params(axis='x', rotation=45, labelsize=12)
         ax.tick_params(axis='y', labelsize=12)
-        ax.grid(visible=True, alpha=0.3, linestyle='--')
-        ax.legend(fontsize=14, loc='upper left', facecolor='black', edgecolor='white')
+        ax.grid(visible=True, alpha=0.3, linestyle='--') # Adds a grid and ensures the graph is displayed, alpha for transparency
+        ax.legend(fontsize=14, loc='upper left', facecolor='black', edgecolor='white') #
 
         # Here we addjust the layout for a better fit
         plt.tight_layout()
@@ -199,10 +195,8 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
 
         # Here we plot the precipitation category
         fig1, ax1 = plt.subplots(figsize=(12, 6))
-        ax1.plot(
-            weather_data2["Time"], weather_data2["Precipitation (mm)"], marker='o', markersize=5,
-            label='Precipitation (mm)', linestyle='-', linewidth=2, color='lightblue'
-        )
+        ax1.plot(weather_data2["Time"], weather_data2["Precipitation (mm)"], marker='o', markersize=5,
+            label='Precipitation (mm)', linestyle='-', linewidth=2, color='lightblue')
         
         ax1.set_xlabel("Time (hours)", fontsize=12)
         ax1.set_ylabel('Precipitation (mm)', fontsize=14)
@@ -227,10 +221,8 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         st.subheader("Solar Irradiation")
         # Here we plot the solar irradiation
         fig2, ax2 = plt.subplots(figsize=(12, 6))
-        ax2.plot(
-            weather_data2["Time"], weather_data2["Solar irradiation (watt)"], marker='o', markersize=5,
-            label='Solar irradiation (watt)', linestyle='-', linewidth=2, color='orange'
-        )
+        ax2.plot(weather_data2["Time"], weather_data2["Solar irradiation (watt)"], marker='o', markersize=5,
+            label='Solar irradiation (watt)', linestyle='-', linewidth=2, color='orange')
         
         ax2.set_xlabel('Time (hours)', fontsize=14)
         ax2.set_ylabel('Solar Irradiation (watt)', fontsize=14)
@@ -283,9 +275,8 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         # Here we ensure that the 'Time' column is datetime
         weather_data4["Time"] = pd.to_datetime(weather_data4["Time"])
 
-
         # Display relative humidity
-        st.subheader("Relative Humidity") # This line creates subheading (Assuming weather_data4 is a pandas DataFrame)
+        st.subheader("Relative Humidity") # Creates subheading (Assuming weather_data4 is a pandas DataFrame)
         x_ticks = weather_data4["Time"][::3] # Extract every third value from the "Time" column for the x-tick labels
         plt.style.use("dark_background")
         # Plot for relative humidity
@@ -321,14 +312,14 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         current_time = datetime.now() # Accessing the current time and storing it in a variable
         time_range_end = current_time + timedelta(hours=3) # Define the time range (next 3 hours)
         
-        # next up we filter weather_data for the next 3 hours
+        # Next up we filter weather_data for the next 3 hours
         next_3_hours_data = weather_data[(weather_data.index > current_time) & (weather_data.index <= time_range_end)] 
 
         # Here we calculate the mean temperature and wind speed
         mean_temperature_next_3_hours = next_3_hours_data['Temperature (°C)'].mean() # Calculate the mean temperature for the next 3 hours
         mean_wind_speed_next_3_hours = next_3_hours_data['Wind Speed (m/s)'].mean()  # Calculate the mean wind speed for the next 3 hours
 
-        # next up we filter weather_data2 for the next 3 hours
+        # Next up we filter weather_data2 for the next 3 hours
         next_3_hours_data_weather2 = weather_data2[
             (weather_data2['Time'] > current_time) & (weather_data2['Time'] <= time_range_end)]
 
@@ -339,13 +330,13 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         time_range_end = current_time + timedelta(hours=3) # Define the time range (next 3 hours)
         
 
-        # next up we filter weather_data3 for the next 3 hours
+        # Next up we filter weather_data3 for the next 3 hours
         next_3_hours_data_weather3 = weather_data3[(weather_data3.index > current_time) & (weather_data3.index <= time_range_end)] # Filter the DataFrame for the next 3 hours
 
         # Here we alculate mean pressure for the next 3 hours
         mean_pressure_next_3_hours = next_3_hours_data_weather3['Luftdruck (hPa)'].mean() # Calculate the mean pressure for the next 3 hours
 
-        # next up we filter weather_data4 for the next 3 hours
+        # Next up we filter weather_data4 for the next 3 hours
         next_3_hours_data_weather4 = weather_data4[
             (weather_data4['Time'] > current_time) & (weather_data4['Time'] <= time_range_end) # Filter the DataFrame for the next 3 hours based on the 'Time' column
         ]
@@ -353,7 +344,7 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
         mean_humidity_next_3_hours = next_3_hours_data_weather4['rel. Luftfeuchtigkeit (%)'].mean() # Calculate the mean relative humidity for the next 3 hours
 
     
-        # here we predict the wave height
+        # Here we predict the wave height
         prediction = model.predict([[mean_temperature_next_3_hours, mean_humidity_next_3_hours, mean_solar_irradiation_next_3_hours, mean_wind_speed_next_3_hours, mean_precipitation_next_3_hours, mean_pressure_next_3_hours]])  # Replace with actual feature values
 
         # Displaying the calculated wave Prediction
@@ -384,17 +375,17 @@ if st.session_state.selected_lake: # This section checks if selected_lake has a 
     st.text("")  # Adds another empty line
     
     if selected_lake["name"] == "Lake Silvaplanersee":
-        # we set up a custom title and description for Silvaplanersee
+        # We set up a custom title and description for Silvaplanersee, because we wanted to implement the Silvaplanersee but the webcame link couldn't be displayed
         st.subheader("Link to Webcam")
         st.write("View the Silvaplana Lake Webcam [here](https://www.skylinewebcams.com/de/webcam/schweiz/graubunden/silvaplana/silvaplana-switzerland.html).")
     else:
-        # we default the title and embed iframe for other lakes
+        # We default the title and embed iframe for other lakes
         st.subheader("Lake Webcam Stream")
         st.write(f"Webcam view of {selected_lake['name']}") # "f", is for the f-string, afterwards with the name we can put out the name of the selected lake
         st.components.v1.iframe(selected_lake["webcam_url"], height=600, scrolling=False) # Let's you embed the website, in our case the webcam, code created with help of discuission platform: (https://discuss.streamlit.io/t/how-do-i-embed-an-existing-non-streamlit-webpage-to-my-streamlit-app/50326/3)
 
     
-    # we generate and display directions link (for this code we used ChatGPT, for proper structuring)
+    # We generate and display directions link (for this code we used ChatGPT, for proper structuring)
     if "user_location" in st.session_state: # If the user's location is available in session_state, this creates a link to get directions to the selected lake
         directions_link = generate_directions_link( # The gernerate_directions_link function creates the URL using the user's coordinates and the lake's
             st.session_state["user_location"],
@@ -470,15 +461,13 @@ else:
             folium.Marker([loc.latitude, loc.longitude], tooltip=loc.address, icon=folium.Icon(color="blue")).add_to(m)
 
             # A circle showing the search area (in blue) is drawn around the user's location in the map
-            folium.Circle(
-                location=[loc.latitude, loc.longitude],
+            folium.Circle(location=[loc.latitude, loc.longitude],
                 radius=radius * 1000,
                 color="blue",
-                fill=False
-            ).add_to(m)
+                fill=False).add_to(m)
 
-            # This loop calculates the distance between the user's location and each lake.
-            # If a lake is within the radius, a red marker for that lake is added to the map, with a tooltip showing its name and distance.
+            # This loop calculates the distance between the user's location and each lake
+            # If a lake is within the radius, a red marker for that lake is added to the map, with a tooltip showing its name and distance
             for lake in swiss_lakes:
                 lake_coords = (lake["latitude"], lake["longitude"])
                 location_coords = (loc.latitude, loc.longitude)
@@ -486,11 +475,8 @@ else:
                 distance_to_lake = geodesic(location_coords, lake_coords).km
                 
                 if distance_to_lake <= radius:
-                    marker = folium.Marker(
-                        lake_coords,
-                        tooltip=f"{lake['name']} ({distance_to_lake:.2f} km away)",
-                        icon=folium.Icon(color="red")
-                    )
+                    marker = folium.Marker(lake_coords,tooltip=f"{lake['name']} ({distance_to_lake:.2f} km away)",
+                        icon=folium.Icon(color="red"))
                     
                     marker.add_child(folium.Popup(f"Click here to select {lake['name']}", parse_html=True))
                     marker.add_to(m)
@@ -499,9 +485,9 @@ else:
             # If the user clicks on a lake marker, this checks if any lake in swiss_lake matches the clicked coordinates
             # If a match is found, st.session_state.selected_lake is set to that lake's data and the st.experimental_rerun() reloads the app to show details for the selected lake
             if st_map["last_object_clicked"] is not None:
-                clicked_coords = st_map["last_object_clicked"]["lat"], st_map["last_object_clicked"]["lng"]
+                clicked_coords = st_map["last_object_clicked"]["lat"], st_map["last_object_clicked"]["lng"] # Tuple containing lat and lng of the choosen location
                 for lake in swiss_lakes:
-                    if (lake["latitude"], lake["longitude"]) == clicked_coords:
-                        st.session_state.selected_lake = lake
+                    if (lake["latitude"], lake["longitude"]) == clicked_coords: # If the lake's coordinates and the clicked coordinates are the same, then the code is executed
+                        st.session_state.selected_lake = lake # Storing the lake
                         st.experimental_rerun()
                         break
