@@ -20,7 +20,7 @@ from joblib import load # To load previously trained models
 
 
 
-# Define a debug flag to control wheter error messages are displayed
+# Define a debug flag to control whether error messages are displayed
 debug = False # By setting "debug = False", it will be assumed the code is error-free (the program will be executed normally)
 
 # Set up the Geolocator 
